@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	db, err := sql.Open("sqlite3", "./pemandu.db")
+	db, err := sql.Open("sqlite3", "pemandu.db")
 	if err != nil {
 		panic(err)
 	}
