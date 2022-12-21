@@ -19,6 +19,29 @@ func Migrate(db *sql.DB) {
 			role VARCHAR(10) NOT NULL,
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);
+
+		CREATE TABLE IF NOT EXISTS destinations (
+			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			name VARCHAR(100) NOT NULL,
+			location VARCHAR(100) NOT NULL,
+			description TEXT NOT NULL,
+		);
+
+		CREATE TABLE IF NOT EXISTS reviews (
+			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			user_id INTEGER NOT NULL,
+			destination_id INTEGER NOT NULL,
+			rating INTEGER NOT NULL,
+			review TEXT NOT NULL,
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			FOREIGN KEY (user_id) REFERENCES user(user_id),
+			FOREIGN KEY (destination_id) REFERENCES destinations(id)
+		);
+
+		CREATE TABLE IF NOT EXISTS TelpDarurat (
+			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			name VARCHAR(100) NOT NULL,
+			number VARCHAR(100) NOT NULL
 	`)
 
 	if err != nil {

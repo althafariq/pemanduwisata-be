@@ -16,8 +16,13 @@ func NewDestinationModels(db *sql.DB) *DestinationModels {
 	}
 }
 
-func (d *DestinationModels) GetDestination() ([]Destination, error) {
-	statement := "SELECT * FROM destination"
+//function to get all destinations including review, budaya, and photos entities
+func (d *DestinationModels) GetAllDestinations() ([]Destination, error) {
+	statement := `SELECT 
+	d.*, b.name, p.path
+	 FROM destinations d
+	 JOIN budaya b ON d.id = b.destination_id
+	 JOIN photos p ON d.id = p.destination_id`
 	rows, err := d.db.Query(statement)
 	if err != nil {
 		return nil, err
@@ -27,7 +32,85 @@ func (d *DestinationModels) GetDestination() ([]Destination, error) {
 	destinations := []Destination{}
 	for rows.Next() {
 		var destination Destination
-		err = rows.Scan(&destination.id, &destination.name, &destination.location)
+		err = rows.Scan(&destination.ID, &destination.Name, &destination.Location, &destination.Description, &destination.BudayaName, &destination.Photo_path)
+		if err != nil {
+			return nil, err
+		}
+		destinations = append(destinations, destination)
+	}
+	return destinations, nil
+}
+
+//function to get destination by id including review, budaya, and photos entities
+func (d *DestinationModels) GetDestinationbyID(id int) ([]Destination, error) {
+	statement := `SELECT 
+	d.*, b.name, p.path
+	 FROM destinations d
+	 JOIN budaya b ON d.id = b.destination_id
+	 JOIN photos p ON d.id = p.destination_id
+	 WHERE d.id = ?`
+	rows, err := d.db.Query(statement, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	destinations := []Destination{}
+	for rows.Next() {
+		var destination Destination
+		err = rows.Scan(&destination.ID, &destination.Name, &destination.Location, &destination.Description, &destination.BudayaName, &destination.Photo_path)
+		if err != nil {
+			return nil, err
+		}
+		destinations = append(destinations, destination)
+	}
+	return destinations, nil
+}
+
+//function to search destination by name including review, budaya, and photos entities
+func (d *DestinationModels) SearchDestinationbyName(name string) ([]Destination, error) {
+	statement := `SELECT 
+	d.*, b.name, p.path
+	 FROM destinations d
+	 JOIN budaya b ON d.id = b.destination_id
+	 JOIN photos p ON d.id = p.destination_id
+	 WHERE d.name LIKE ?`
+	rows, err := d.db.Query(statement, "%"+name+"%")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	destinations := []Destination{}
+	for rows.Next() {
+		var destination Destination
+		err = rows.Scan(&destination.ID, &destination.Name, &destination.Location, &destination.Description, &destination.BudayaName, &destination.Photo_path)
+		if err != nil {
+			return nil, err
+		}
+		destinations = append(destinations, destination)
+	}
+	return destinations, nil
+}
+
+//function to search destination by location including review, budaya, and photos entities
+func (d *DestinationModels) SearchDestinationbyLocation(location string) ([]Destination, error) {
+	statement := `SELECT 
+	d.*, b.name, p.path
+	 FROM destinations d
+	 JOIN budaya b ON d.id = b.destination_id
+	 JOIN photos p ON d.id = p.destination_id
+	 WHERE d.location LIKE ?`
+	rows, err := d.db.Query(statement, "%"+location+"%")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	destinations := []Destination{}
+	for rows.Next() {
+		var destination Destination
+		err = rows.Scan(&destination.ID, &destination.Name, &destination.Location, &destination.Description, &destination.BudayaName, &destination.Photo_path)
 		if err != nil {
 			return nil, err
 		}

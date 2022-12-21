@@ -54,6 +54,8 @@ func NewApi(
 		profileRouter.PATCH("", api.updateProfile)
 		profileRouter.PUT("/avatar", api.changeAvatar)
 	}
+
+	
 	
 	return api
 }
