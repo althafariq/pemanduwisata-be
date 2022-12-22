@@ -17,6 +17,58 @@ func NewReviewModels(db *sql.DB) *ReviewModels {
 	}
 }
 
+func (r *ReviewModels) GetReviewbyDestinationID(userID, destinationID int) ([]Review, error) {
+	statement := `SELECT 
+	r.*, u.firstname, u.lastname, u.profile_pic, d.name, d.location
+	 FROM reviews r
+	 JOIN user u ON r.user_id = u.user_id
+	 JOIN destinations d ON r.destination_id = d.id
+	 WHERE r.destination_id = ? AND r.user_id = ?`
+	rows, err := r.db.Query(statement, destinationID, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	reviews := []Review{}
+	for rows.Next() {
+		var review Review
+		err = rows.Scan(
+			&review.ID, 
+			&review.UserID, 
+			&review.DestinationID, 
+			&review.Rating, 
+			&review.Review, 
+			&review.CreatedAt, 
+			&review.Firstname, 
+			&review.Lastname, 
+			&review.Profile_pic, 
+			&review.DestinationName, 
+			&review.DestinationLocation,
+		)
+		if err != nil {
+			return nil, err
+		}
+		reviews = append(reviews, review)
+	}
+	return reviews, nil
+}
+
+func (r *ReviewModels) GetReviewbyUserID(reviewID int) (int, error) {
+	statement := `SELECT user_id FROM reviews WHERE id = ?`
+	
+	var userID int
+	err := r.db.QueryRow(statement, reviewID).Scan(&userID)
+	switch err {
+	case sql.ErrNoRows:
+		return 0, nil
+	case nil:
+		return userID, nil
+	default:
+		return 0, err
+	} 
+}
+
 func (r *ReviewModels) GetReviewbyID(id int) ([]Review, error) {
 	statement := `SELECT 
 	r.*, u.firstname, u.lastname, u.profile_pic, d.name, d.location 
@@ -42,32 +94,32 @@ func (r *ReviewModels) GetReviewbyID(id int) ([]Review, error) {
 	return reviews, nil
 }
 
-func (r *ReviewModels) GetReviewbyUserID(id int) ([]Review, error) {
-	statement := `SELECT 
-	r.*, u.firstname, u.lastname, u.profile_pic, d.name, d.location 
-	 FROM reviews r
-	 JOIN user u ON r.user_id = u.user_id
-	 JOIN destinations d ON r.destination_id = d.id
-	 WHERE r.user_id = ?`
-	rows, err := r.db.Query(statement, id)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
+// func (r *ReviewModels) GetReviewbyUserID(id int) ([]Review, error) {
+// 	statement := `SELECT 
+// 	r.*, u.firstname, u.lastname, u.profile_pic, d.name, d.location 
+// 	 FROM reviews r
+// 	 JOIN user u ON r.user_id = u.user_id
+// 	 JOIN destinations d ON r.destination_id = d.id
+// 	 WHERE r.user_id = ?`
+// 	rows, err := r.db.Query(statement, id)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	defer rows.Close()
 
-	reviews := []Review{}
-	for rows.Next() {
-		var review Review
-		err = rows.Scan(&review.ID, &review.UserID, &review.DestinationID, &review.Rating, &review.Review, &review.CreatedAt, &review.Firstname, &review.Lastname, &review.Profile_pic, &review.DestinationName, &review.DestinationLocation)
-		if err != nil {
-			return nil, err
-		}
-		reviews = append(reviews, review)
-	}
-	return reviews, nil
-}
+// 	reviews := []Review{}
+// 	for rows.Next() {
+// 		var review Review
+// 		err = rows.Scan(&review.ID, &review.UserID, &review.DestinationID, &review.Rating, &review.Review, &review.CreatedAt, &review.Firstname, &review.Lastname, &review.Profile_pic, &review.DestinationName, &review.DestinationLocation)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		reviews = append(reviews, review)
+// 	}
+// 	return reviews, nil
+// }
 
-func (r *ReviewModels) InsertReview(review Review) (int, error) {
+func (r *ReviewModels) CreateReview(review Review) (int, error) {
 	statement := `INSERT INTO reviews (user_id, destination_id, rating, review, created_at) VALUES (?, ?, ?, ?, ?)`
 	result, err := r.db.Exec(statement, review.UserID, review.DestinationID, review.Rating, review.Review, review.CreatedAt)
 	if err != nil {

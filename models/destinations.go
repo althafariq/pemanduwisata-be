@@ -67,6 +67,21 @@ func (d *DestinationModels) GetDestinationbyID(id int) ([]Destination, error) {
 	return destinations, nil
 }
 
+//function to create destination including review, budaya, and photos entities
+func (d *DestinationModels) CreateDestination(destination *Destination) error {
+	statement := `INSERT INTO destinations (name, location, description) VALUES (?, ?, ?)`
+	result, err := d.db.Exec(statement, destination.Name, destination.Location, destination.Description)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	destination.ID = int(id)
+	return nil
+}
+
 //function to search destination by name including review, budaya, and photos entities
 func (d *DestinationModels) SearchDestinationbyName(name string) ([]Destination, error) {
 	statement := `SELECT 
@@ -117,4 +132,14 @@ func (d *DestinationModels) SearchDestinationbyLocation(location string) ([]Dest
 		destinations = append(destinations, destination)
 	}
 	return destinations, nil
+}
+
+//function to delete destination
+func (d *DestinationModels) DeleteDestination(id int) error {
+	statement := `DELETE FROM destinations WHERE id = ?`
+	_, err := d.db.Exec(statement, id)
+	if err != nil {
+		return err
+	}
+	return nil
 }
