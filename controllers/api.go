@@ -13,8 +13,11 @@ import (
 )
 
 type API struct {
-	userModels		models.UserModels
-	router 				*gin.Engine
+	userModels					models.UserModels
+	destinationModels		models.DestinationModels
+	reviewModels				models.ReviewModels
+	telpDaruratModels 	models.TelpDaruratModels
+	router 							*gin.Engine
 }
 
 func NewApi(
@@ -54,6 +57,8 @@ func NewApi(
 		profileRouter.PATCH("", api.updateProfile)
 		profileRouter.PUT("/avatar", api.changeAvatar)
 	}
+
+	
 
 	
 	
