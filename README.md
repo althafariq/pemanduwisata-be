@@ -19,3 +19,19 @@ go get github.com/mattn/go-sqlite3 database/sql
 ```sh
 go get golang.org/x/crypto/bcrypt
 ```
+
+## Run Migration and Seeder
+
+In root directory, run this command to run migration and seeder
+
+```sh
+go run db/main.go
+```
+
+## Run the app
+
+Running in `http://localhost:8080`
+
+```sh
+go run main.go
+```
