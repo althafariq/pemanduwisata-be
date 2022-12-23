@@ -37,6 +37,18 @@ type ErrorResponse struct {
 	Message string `json:"error"`
 }
 
+func (api *API) GetAllDestination(c *gin.Context) {
+	destination, err := api.destinationModels.GetAllDestinations()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, 
+		gin.H{"error": err.Error()},
+		)
+		return
+	}
+
+	c.JSON(http.StatusOK, destination)
+}
+
 func (api *API) CreateDestination(c *gin.Context) {
 	var (
 		req = CreateDestinationRequest{}
