@@ -54,7 +54,19 @@ func (api *API) GetAllReviews(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, reviews)	
+	avgRating, err := api.reviewModels.GetAverageRating(destinationID)
+	if err != nil {
+		c.AbortWithStatusJSON(
+			http.StatusInternalServerError,
+			gin.H{"error": err.Error()},
+		)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"reviews": reviews,
+		"avg_rating": avgRating,
+	})
 }
 
 func (api *API) CreateReview(c *gin.Context) {
@@ -91,7 +103,7 @@ func (api *API) CreateReview(c *gin.Context) {
 
 //function to delete review
 func (api *API) DeleteReview(c *gin.Context) {
-	reviewID, err := strconv.Atoi(c.Param("reviewID"))
+	reviewID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.AbortWithStatusJSON(
 			http.StatusBadRequest,
