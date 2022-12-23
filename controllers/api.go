@@ -22,6 +22,9 @@ type API struct {
 
 func NewApi(
 	userModels models.UserModels,
+	destinationModels		models.DestinationModels,
+	reviewModels				models.ReviewModels,
+	telpDaruratModels 	models.TelpDaruratModels,
 ) API {
 	router := gin.Default()
 
@@ -34,6 +37,9 @@ func NewApi(
 	api := API {
 		router: router,
 		userModels: userModels,
+		destinationModels: destinationModels,
+		reviewModels: reviewModels,
+		telpDaruratModels: telpDaruratModels,
 	}
 
 	// Untuk validasi request dengan mengembalikan nama dari tag json jika ada
@@ -51,6 +57,8 @@ func NewApi(
 	router.POST("/api/login", api.login)
 	router.POST("/api/register", api.register)
 
+	router.GET("/api/telp-darurat", api.GetAllTelpDarurat)
+
 	profileRouter := router.Group("/api/profile", AuthMiddleware())
 	{
 		profileRouter.GET("", api.getProfile)
@@ -58,9 +66,15 @@ func NewApi(
 		profileRouter.PUT("/avatar", api.changeAvatar)
 	}
 
-	
+	router.GET("/api/review", api.GetAllReviews)
+	reviewRouterWithAuth := router.Group("/api/review", AuthMiddleware())
+	{
+		// reviewRouterWithAuth.GET("", api.GetAllReviews)
+		reviewRouterWithAuth.POST("", api.CreateReview)
+		reviewRouterWithAuth.DELETE("/:id", api.DeleteReview)
+	}
 
-	
+	router.GET("/api/destination", api.GetAllDestination)
 	
 	return api
 }
