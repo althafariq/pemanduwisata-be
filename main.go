@@ -17,7 +17,11 @@ func main() {
 	defer db.Close()
 
 	usersModel := models.NewUserModels(db)
+	destinationModel := models.NewDestinationModels(db)
+	reviewModel := models.NewReviewModels(db)
+	// budayaModel := models.NewBudayaModels(db)
+	telpDaruratModel := models.NewTelpDaruratModels(db)
 
-	mainApi := controllers.NewApi(*usersModel)
+	mainApi := controllers.NewApi(*usersModel, *destinationModel, *reviewModel, *telpDaruratModel)
 	mainApi.Start()
 }
