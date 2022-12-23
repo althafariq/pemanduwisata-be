@@ -17,7 +17,7 @@ func NewTelpDaruratModels(db *sql.DB) *TelpDaruratModels {
 }
 
 func (t *TelpDaruratModels) GetAllTelpDarurat() ([]TelpDarurat, error) {
-	statement := `SELECT * FROM telp_darurat`
+	statement := `SELECT * FROM TelpDarurat`
 	rows, err := t.db.Query(statement)
 	if err != nil {
 		return nil, err
