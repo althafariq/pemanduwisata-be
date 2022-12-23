@@ -75,6 +75,12 @@ func NewApi(
 	}
 
 	router.GET("/api/destination", api.GetAllDestination)
+	// destinationRouterWithAuth := router.Group("/api/destination", AuthMiddleware())
+	// {
+	// 	//load endpoint to show budaya, photos, and review
+	// 	destinationRouterWithAuth.GET("", api.GetAllDestination)
+
+	// }
 	
 	return api
 }
