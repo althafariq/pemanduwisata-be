@@ -27,6 +27,7 @@ type RegisterReqBody struct {
 	Lastname  string `json:"lastname" binding:"required"`
 	Email     string `json:"email" binding:"required"`
 	Password  string `json:"password" binding:"required"`
+	Role string `json:"role" binding:"required"`
 	ConfirmPassword string `json:"confirm_password" binding:"required" validate:"eqfield=Password"`
 }
 
@@ -36,6 +37,7 @@ type ProfilePicReqBody struct {
 
 type LoginSuccessResponse struct {
 	Token string `json:"token"`
+	Message string `json:"message"`
 }
 
 type RegisterSuccessResponse struct {
@@ -76,7 +78,7 @@ func (api *API) register(c *gin.Context) {
 		return
 	}
 
-	tokenString, err := api.generateJWT(&userId)
+	tokenString, err := api.generateJWT(&userId, &input.Role)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -109,19 +111,23 @@ func (api *API) login(c *gin.Context) {
 		return
 	}
 
-	// role, err := api.userModels.GetUserRole(*userId)
-	// if err != nil {
-	// 	c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	// 	return
-	// }
-
-	tokenString, err := api.generateJWT(userId)
+	role, err := api.userModels.GetUserRole(*userId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, LoginSuccessResponse{Token: tokenString})
+	tokenString, err := api.generateJWT(userId, role)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, LoginSuccessResponse{
+		Token: tokenString,
+		//show message with the role
+		Message: fmt.Sprintf("You're now login as %s", *role),
+	})
 }
 
 func (api *API) changeAvatar(c *gin.Context) {
@@ -226,12 +232,12 @@ func ValidateToken(tokenString string) (*jwt.Token, error) {
 	return token, err
 }
 
-func (api API) generateJWT(userId *int) (string, error) {
+func (api API) generateJWT(userId *int, role *string) (string, error) {
 	expTime := time.Now().Add(60 * time.Minute)
 
 	claims := &Claims{
 		Id:   *userId,
-		// Role: *role,
+		Role: *role,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expTime.Unix(),
 		},
