@@ -42,5 +42,39 @@ func AuthMiddleware() gin.HandlerFunc {
 	}
 }
 
+func AdminMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		tokenString := c.GetHeader("Authorization")
+		if tokenString == "" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, AuthErrorResponse{Error: "No token provided"})
+			return
+		}
+
+		tokenString = tokenString[(len("Bearer ")):]
+
+		token, err := ValidateToken(tokenString)
+		if err != nil {
+			if err == jwt.ErrSignatureInvalid {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, AuthErrorResponse{Error: "Invalid token"})
+				return
+			}
+			c.AbortWithStatusJSON(http.StatusBadRequest, AuthErrorResponse{Error: "Bad Request"})
+			return
+		}
+
+		if token.Valid {
+			claims := token.Claims.(*Claims)
+			if claims.Role != "admin" {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, AuthErrorResponse{Error: "You are not authorized as admin"})
+				return
+			}
+			c.Next()
+		} else {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, AuthErrorResponse{Error: "Invalid token"})
+		}
+
+	}
+}
+
 
 
