@@ -24,7 +24,22 @@ func Migrate(db *sql.DB) {
 			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 			name VARCHAR(100) NOT NULL,
 			location VARCHAR(100) NOT NULL,
+			description TEXT NOT NULL
+		);
+
+		CREATE TABLE IF NOT EXISTS photos (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			destination_id INTEGER NOT NULL,
+			path VARCHAR(100),
+			FOREIGN KEY (destination_id) REFERENCES destinations(id)
+		);
+
+		CREATE TABLE IF NOT EXISTS budaya (
+			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			name VARCHAR(100) NOT NULL,
 			description TEXT NOT NULL,
+			destination_id INTEGER NOT NULL,
+			FOREIGN KEY (destination_id) REFERENCES destinations(id)
 		);
 
 		CREATE TABLE IF NOT EXISTS reviews (
@@ -42,6 +57,7 @@ func Migrate(db *sql.DB) {
 			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 			name VARCHAR(100) NOT NULL,
 			number VARCHAR(100) NOT NULL
+		);
 	`)
 
 	if err != nil {
