@@ -27,7 +27,7 @@ type RegisterReqBody struct {
 	Lastname  string `json:"lastname" binding:"required"`
 	Email     string `json:"email" binding:"required"`
 	Password  string `json:"password" binding:"required"`
-	Role string `json:"role" binding:"required"`
+	Role string `json:"role" validate:"oneof=admin user"`
 	ConfirmPassword string `json:"confirm_password" binding:"required" validate:"eqfield=Password"`
 }
 
@@ -233,7 +233,7 @@ func ValidateToken(tokenString string) (*jwt.Token, error) {
 }
 
 func (api API) generateJWT(userId *int, role *string) (string, error) {
-	expTime := time.Now().Add(60 * time.Minute)
+	expTime := time.Now().Add(180 * time.Minute)
 
 	claims := &Claims{
 		Id:   *userId,
