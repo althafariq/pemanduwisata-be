@@ -15,16 +15,14 @@ type User struct {
 
 type Review struct {
 	ID 									int    		`json:"id"`
-	UserID 							int    		`json:"user_id"`
 	DestinationID 			int    		`json:"destination_id"`
-	Rating 							int    		`json:"rating"`
-	Review 							string 		`json:"review"`
-	CreatedAt 					time.Time `json:"created_at"`
+	UserID 							int    		`json:"user_id"`
 	Firstname 					string 		`json:"firstname"`
 	Lastname 						string 		`json:"lastname"`
 	Profile_pic 				*string 	`json:"profile_pic"`
-	DestinationName 		string 		`json:"name"`
-	DestinationLocation string 		`json:"location"`
+	Rating 							int    		`json:"rating"`
+	Review 							string 		`json:"review"`
+	CreatedAt 					time.Time `json:"created_at"`
 }
 
 type TelpDarurat struct {
@@ -39,19 +37,8 @@ type Destination struct {
 	Location 						string 		`json:"location"`
 	Description 				string 		`json:"description"`
 	BudayaName 					string 		`json:"budaya_name"`
-	Photo_path 					string 		`json:"photo_path"`
-
-}
-
-type Budaya struct {
-	ID 									int 			`json:"id"`
-	DestinationID 			int 			`json:"destination_id"`
-	Name 								string 		`json:"name"`
-	Description 				string 		`json:"description"`
-}
-
-type Photos struct {
-	photo_id 				int 			`json:"photo_id"`
-	destination_id 	int		 		`json:"destination_id"`
-	path 						string 		`json:"path"`
+	BudayaDescription 	string 		`json:"budaya_description"`
+	PhotoPath 					string 		`json:"photo_path"`
+	AvgRating 					float64 	`json:"avg_rating"`
+	TotalReview 				int 			`json:"total_review"`
 }

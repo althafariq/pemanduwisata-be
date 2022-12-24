@@ -17,14 +17,14 @@ func NewReviewModels(db *sql.DB) *ReviewModels {
 	}
 }
 
-func (r *ReviewModels) GetReviewbyDestinationID(userID, destinationID int) ([]Review, error) {
+func (r *ReviewModels) GetReviewbyDestinationID(destinationID int) ([]Review, error) {
 	statement := `SELECT 
-	r.*, u.firstname, u.lastname, u.profile_pic, d.name, d.location
+	r.*, u.firstname, u.lastname, u.profile_pic
 	 FROM reviews r
 	 JOIN user u ON r.user_id = u.user_id
 	 JOIN destinations d ON r.destination_id = d.id
-	 WHERE r.destination_id = ? AND r.user_id = ?`
-	rows, err := r.db.Query(statement, destinationID, userID)
+	 WHERE r.destination_id = ?`
+	rows, err := r.db.Query(statement, destinationID)
 	if err != nil {
 		return nil, err
 	}
@@ -42,9 +42,7 @@ func (r *ReviewModels) GetReviewbyDestinationID(userID, destinationID int) ([]Re
 			&review.CreatedAt, 
 			&review.Firstname, 
 			&review.Lastname, 
-			&review.Profile_pic, 
-			&review.DestinationName, 
-			&review.DestinationLocation,
+			&review.Profile_pic,
 		)
 		if err != nil {
 			return nil, err
@@ -69,55 +67,6 @@ func (r *ReviewModels) GetReviewbyUserID(reviewID int) (int, error) {
 	} 
 }
 
-func (r *ReviewModels) GetReviewbyID(id int) ([]Review, error) {
-	statement := `SELECT 
-	r.*, u.firstname, u.lastname, u.profile_pic, d.name, d.location 
-	 FROM reviews r
-	 JOIN user u ON r.user_id = u.user_id
-	 JOIN destinations d ON r.destination_id = d.id
-	 WHERE r.destination_id = ?`
-	rows, err := r.db.Query(statement, id)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	reviews := []Review{}
-	for rows.Next() {
-		var review Review
-		err = rows.Scan(&review.ID, &review.UserID, &review.DestinationID, &review.Rating, &review.Review, &review.CreatedAt, &review.Firstname, &review.Lastname, &review.Profile_pic, &review.DestinationName, &review.DestinationLocation)
-		if err != nil {
-			return nil, err
-		}
-		reviews = append(reviews, review)
-	}
-	return reviews, nil
-}
-
-// func (r *ReviewModels) GetReviewbyUserID(id int) ([]Review, error) {
-// 	statement := `SELECT 
-// 	r.*, u.firstname, u.lastname, u.profile_pic, d.name, d.location 
-// 	 FROM reviews r
-// 	 JOIN user u ON r.user_id = u.user_id
-// 	 JOIN destinations d ON r.destination_id = d.id
-// 	 WHERE r.user_id = ?`
-// 	rows, err := r.db.Query(statement, id)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	defer rows.Close()
-
-// 	reviews := []Review{}
-// 	for rows.Next() {
-// 		var review Review
-// 		err = rows.Scan(&review.ID, &review.UserID, &review.DestinationID, &review.Rating, &review.Review, &review.CreatedAt, &review.Firstname, &review.Lastname, &review.Profile_pic, &review.DestinationName, &review.DestinationLocation)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		reviews = append(reviews, review)
-// 	}
-// 	return reviews, nil
-// }
 
 func (r *ReviewModels) CreateReview(review Review) (int, error) {
 	statement := `INSERT INTO reviews (user_id, destination_id, rating, review, created_at) VALUES (?, ?, ?, ?, ?)`
@@ -150,13 +99,22 @@ func (r *ReviewModels) DeleteReview(id int) error {
 	return nil
 }
 
-//function to calculate average rating
 func (r *ReviewModels) GetAverageRating(id int) (float64, error) {
 	statement := `SELECT AVG(rating) FROM reviews WHERE destination_id = ?`
-	var avgRating float64
+	var avgRating sql.NullFloat64
 	err := r.db.QueryRow(statement, id).Scan(&avgRating) 
 	if err != nil {
 		return -1, err
 	}
-	return avgRating, nil
+	return avgRating.Float64, nil
+}
+
+func (r *ReviewModels) GetReviewCount(id int) (int, error) {
+	statement := `SELECT COUNT(*) FROM reviews WHERE destination_id = ?`
+	var reviewCount int
+	err := r.db.QueryRow(statement, id).Scan(&reviewCount) 
+	if err != nil {
+		return -1, err
+	}
+	return reviewCount, nil
 }
