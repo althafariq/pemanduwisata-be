@@ -6,19 +6,20 @@ import (
 	"strconv"
 
 	"github.com/althafariq/pemanduwisata-be/helper"
+	"github.com/althafariq/pemanduwisata-be/models"
 	"github.com/althafariq/pemanduwisata-be/service"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
 
 type CreateReviewRequest struct {
-	DestinationID int    `json:"destination_id" binding:"required, number"` 
+	DestinationID int    `json:"destination_id" binding:"required"` 
 	Review string `json:"review" binding:"required"`
 	Rating int    `json:"rating" binding:"required"`
 }
 
 type UpdateReviewRequest struct {
-	ReviewID int    `json:"review_id" binding:"required, number"`
+	ReviewID int    `json:"review_id" binding:"required"`
 	Review string `json:"review" binding:"required"`
 	Rating int    `json:"rating" binding:"required"`
 }
@@ -33,19 +34,7 @@ func (api *API) GetAllReviews(c *gin.Context) {
 		return
 	}
 
-	userID := -1
-	if c.GetHeader("Authorization") != "" {
-		userID, err = api.getUserIdFromToken(c)
-		if err != nil {
-			c.AbortWithStatusJSON(
-				http.StatusBadRequest,
-				gin.H{"error": err.Error()},
-			)
-			return
-		}
-	}
-
-	reviews, err := api.reviewModels.GetReviewbyDestinationID(userID, destinationID)
+	reviews, err := api.reviewModels.GetReviewbyDestinationID(destinationID)
 	if err != nil {
 		c.AbortWithStatusJSON(
 			http.StatusInternalServerError,
@@ -88,17 +77,42 @@ func (api *API) CreateReview(c *gin.Context) {
 		return
 	}
 
+	userID, err := api.getUserIdFromToken(c)
+	if err != nil {
+		c.AbortWithStatusJSON(
+			http.StatusBadRequest,
+			gin.H{"error": err.Error()},
+		)
+		return
+	}
+
 	isReviewOK := service.GetValidationInstance().Validate(createReviewRequest.Review)
 	if !isReviewOK {
 		c.AbortWithStatusJSON(
 			http.StatusBadRequest, 
-			//give an error for containing bad words
 			gin.H{"error": "Review contains bad words"}, 
 		)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Review added"})
+	reviewID, err := api.reviewModels.CreateReview(models.Review{
+		DestinationID: createReviewRequest.DestinationID,
+		UserID: userID,
+		Review: createReviewRequest.Review,
+		Rating: createReviewRequest.Rating,
+	})
+	if err != nil {
+		c.AbortWithStatusJSON(
+			http.StatusInternalServerError,
+			gin.H{"error": "kenapa ya"},
+		)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Review added",
+		"review_id": reviewID,
+	})
 }
 
 //function to delete review
