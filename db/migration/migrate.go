@@ -27,7 +27,7 @@ func Migrate(db *sql.DB) {
 			description TEXT NOT NULL,
 			budaya_name VARCHAR(100) NULL,
 			budaya_description TEXT NULL,
-			photo_path VARCHAR(100) NOT NULL
+			photo_path VARCHAR(100) NULL
 		);
 
 		CREATE TABLE IF NOT EXISTS reviews (
