@@ -66,7 +66,7 @@ func NewApi(
 		profileRouter.PUT("/avatar", api.changeAvatar)
 	}
 
-	router.GET("/api/review", api.GetAllReviews)
+	router.GET("/api/review/:destinationID", api.GetAllReviews)
 	reviewRouterWithAuth := router.Group("/api/review", AuthMiddleware())
 	{
 		// reviewRouterWithAuth.GET("", api.GetAllReviews)
