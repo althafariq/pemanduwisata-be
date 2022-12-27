@@ -21,9 +21,10 @@ func (r *ReviewModels) GetReviewbyDestinationID(destinationID int) ([]Review, er
 	statement := `SELECT 
 	r.*, u.firstname, u.lastname, u.profile_pic
 	 FROM reviews r
-	 JOIN user u ON r.user_id = u.user_id
-	 JOIN destinations d ON r.destination_id = d.id
-	 WHERE r.destination_id = ?`
+	 LEFT JOIN user u ON r.user_id = u.user_id
+	 LEFT JOIN destinations d ON r.destination_id = d.id
+	 WHERE r.destination_id = ?
+	 ORDER BY r.created_at DESC`
 	rows, err := r.db.Query(statement, destinationID)
 	if err != nil {
 		return nil, err
