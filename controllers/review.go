@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -25,7 +26,7 @@ type UpdateReviewRequest struct {
 }
 
 func (api *API) GetAllReviews(c *gin.Context) {
-	destinationID, err := strconv.Atoi(c.Query("destinationID"))
+	destinationID, err := strconv.Atoi(c.Param("destinationID"))
 	if err != nil {
 		c.AbortWithStatusJSON(
 			http.StatusBadRequest,
@@ -43,6 +44,11 @@ func (api *API) GetAllReviews(c *gin.Context) {
 		return
 	}
 
+	if len(reviews) == 0 {
+		c.JSON(http.StatusOK, []string{}) //return empty array
+		return
+	}
+
 	avgRating, err := api.reviewModels.GetAverageRating(destinationID)
 	if err != nil {
 		c.AbortWithStatusJSON(
@@ -52,9 +58,33 @@ func (api *API) GetAllReviews(c *gin.Context) {
 		return
 	}
 
+	fmt.Println(reviews)
+
+	reviewbyDestination := make(map[int]models.Review)
+	for _, v := range reviews {
+		if _, ok := reviewbyDestination[v.ID]; !ok {
+			reviewbyDestination[v.ID] = models.Review{
+				ID: v.ID,
+				DestinationID: v.DestinationID,
+				UserID: v.UserID,
+				Firstname: v.Firstname,
+				Lastname: v.Lastname,
+				Profile_pic: v.Profile_pic,
+				Rating: v.Rating,
+				Review: v.Review,
+				CreatedAt: v.CreatedAt,
+			}
+		}
+	}
+
+	res := make([]models.Review, 0, len(reviewbyDestination))
+	for _, v := range reviewbyDestination {
+		res = append(res, v)
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"reviews": reviews,
 		"avg_rating": avgRating,
+		"reviews": res,
 	})
 }
 
@@ -115,7 +145,6 @@ func (api *API) CreateReview(c *gin.Context) {
 	})
 }
 
-//function to delete review
 func (api *API) DeleteReview(c *gin.Context) {
 	reviewID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -153,7 +182,7 @@ func (api *API) DeleteReview(c *gin.Context) {
 	} else if authorID != userID {
 		c.AbortWithStatusJSON(
 			http.StatusForbidden,
-			gin.H{"error": "You are not authorized to delete this review"},
+			gin.H{"error": "You are not authorized to delete this"},
 		)
 		return
 	}
@@ -167,5 +196,6 @@ func (api *API) DeleteReview(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Review deleted"})
+	c.JSON(http.StatusOK, gin.H{ "message": fmt.Sprintf("Review with id %d deleted", reviewID),
+	})
 }
