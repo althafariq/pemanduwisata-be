@@ -79,11 +79,11 @@ func NewApi(
 
 	router.GET("/api/destination", api.GetAllDestination)
 	router.GET("/api/destination/:id", api.GetDestination)
-	router.POST("", api.CreateDestination)
-	router.POST("/images/:id", api.UploadImage)
-	router.PUT("", api.UpdateDestination) //edit destination
-	router.PUT("/images/:id", api.UploadImage)
-	router.DELETE("/:id", api.DeleteDestination)
+	router.POST("/api/destination", api.CreateDestination)
+	router.POST("/api/destination/images/:id", api.UploadImage)
+	router.PUT("/api/destination", api.UpdateDestination) //edit destination
+	router.PUT("/api/destination/images/:id", api.UploadImage)
+	router.DELETE("/api/destination/:id", api.DeleteDestination)
 
 	// destinationRouterWithAuth := router.Group("/api/destination", AdminMiddleware())
 	// {
