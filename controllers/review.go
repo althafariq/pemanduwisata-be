@@ -93,13 +93,13 @@ func (api *API) CreateReview(c *gin.Context) {
 	if err != nil {
 		c.AbortWithStatusJSON(
 			http.StatusBadRequest,
-			gin.H{"error": err.Error()},
+			gin.H{"error": "error disini"},
 		)
 		return
 	}
 
 	var createReviewRequest CreateReviewRequest
-	error := c.ShouldBind(&createReviewRequest)
+	error := c.ShouldBindJSON(&createReviewRequest)
 	if error != nil {
 		var ve validator.ValidationErrors
 		if errors.As(err, &ve) {
