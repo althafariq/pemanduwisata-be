@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/althafariq/pemanduwisata-be/helper"
 	"github.com/althafariq/pemanduwisata-be/models"
@@ -139,6 +140,8 @@ func (api *API) CreateReview(c *gin.Context) {
 		UserID: userID,
 		Review: createReviewRequest.Review,
 		Rating: createReviewRequest.Rating,
+		//use time now
+		CreatedAt: time.Now(),
 	})
 	if err != nil {
 		c.AbortWithStatusJSON(
