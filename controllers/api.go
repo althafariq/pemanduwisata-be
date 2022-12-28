@@ -67,7 +67,7 @@ func NewApi(
 	}
 
 	router.GET("/api/review/:destinationID", api.GetAllReviews)
-	router.POST("", api.CreateReview)
+	router.POST("/api/review/:destinationID", api.CreateReview)
 	router.DELETE("/:id", api.DeleteReview)
 
 	// reviewRouterWithAuth := router.Group("/api/review", AuthMiddleware())

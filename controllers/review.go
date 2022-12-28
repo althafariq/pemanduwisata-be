@@ -89,9 +89,18 @@ func (api *API) GetAllReviews(c *gin.Context) {
 }
 
 func (api *API) CreateReview(c *gin.Context) {
-	var createReviewRequest CreateReviewRequest
-	err := c.ShouldBind(&createReviewRequest)
+	destinationID, err := strconv.Atoi(c.Param("destinationID"))
 	if err != nil {
+		c.AbortWithStatusJSON(
+			http.StatusBadRequest,
+			gin.H{"error": err.Error()},
+		)
+		return
+	}
+
+	var createReviewRequest CreateReviewRequest
+	error := c.ShouldBind(&createReviewRequest)
+	if error != nil {
 		var ve validator.ValidationErrors
 		if errors.As(err, &ve) {
 			c.AbortWithStatusJSON(
@@ -126,7 +135,7 @@ func (api *API) CreateReview(c *gin.Context) {
 	}
 
 	reviewID, err := api.reviewModels.CreateReview(models.Review{
-		DestinationID: createReviewRequest.DestinationID,
+		DestinationID: destinationID,
 		UserID: userID,
 		Review: createReviewRequest.Review,
 		Rating: createReviewRequest.Rating,
