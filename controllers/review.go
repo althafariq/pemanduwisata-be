@@ -14,7 +14,7 @@ import (
 )
 
 type CreateReviewRequest struct {
-	DestinationID int    `json:"destination_id" binding:"required"` 
+	// DestinationID int    `json:"destination_id" binding:"required"` 
 	Review string `json:"review" binding:"required"`
 	Rating int    `json:"rating" binding:"required"`
 }
