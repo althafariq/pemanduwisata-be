@@ -38,6 +38,7 @@ type ProfilePicReqBody struct {
 type LoginSuccessResponse struct {
 	Token string `json:"token"`
 	Fullname string `json:"fullname"`
+	Role string `json:"role"`
 	Message string `json:"message"`
 }
 
@@ -82,6 +83,7 @@ func (api *API) register(c *gin.Context) {
 
 	c.JSON(http.StatusOK, LoginSuccessResponse{Token: tokenString,
 		Fullname: fmt.Sprintf("%s %s", input.Firstname, input.Lastname),
+		Role: input.Role,
 		Message: fmt.Sprintf("You're now login as %s", input.Role),
 	})
 }
@@ -125,6 +127,7 @@ func (api *API) login(c *gin.Context) {
 	c.JSON(http.StatusOK, LoginSuccessResponse{
 		Token: tokenString,
 		Fullname: fmt.Sprintf("%s %s", *firstname, *lastname),
+		Role: *role,
 		Message: fmt.Sprintf("You're now login as %s", *role),
 	})
 }
