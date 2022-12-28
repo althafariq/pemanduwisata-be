@@ -67,23 +67,32 @@ func NewApi(
 	}
 
 	router.GET("/api/review/:destinationID", api.GetAllReviews)
-	reviewRouterWithAuth := router.Group("/api/review", AuthMiddleware())
-	{
-		// reviewRouterWithAuth.GET("", api.GetAllReviews)
-		reviewRouterWithAuth.POST("", api.CreateReview)
-		reviewRouterWithAuth.DELETE("/:id", api.DeleteReview)
-	}
+	router.POST("", api.CreateReview)
+	router.DELETE("/:id", api.DeleteReview)
+
+	// reviewRouterWithAuth := router.Group("/api/review", AuthMiddleware())
+	// {
+	// 	// reviewRouterWithAuth.GET("", api.GetAllReviews)
+	// 	reviewRouterWithAuth.POST("", api.CreateReview)
+	// 	reviewRouterWithAuth.DELETE("/:id", api.DeleteReview)
+	// }
 
 	router.GET("/api/destination", api.GetAllDestination)
 	router.GET("/api/destination/:id", api.GetDestination)
-	destinationRouterWithAuth := router.Group("/api/destination", AdminMiddleware())
-	{
-		destinationRouterWithAuth.POST("", api.CreateDestination)
-		destinationRouterWithAuth.POST("/images/:id", api.UploadImage)
-		destinationRouterWithAuth.PUT("", api.UpdateDestination)
-		destinationRouterWithAuth.PUT("/images/:id", api.UploadImage)
-		destinationRouterWithAuth.DELETE("/:id", api.DeleteDestination)
-	}
+	router.POST("", api.CreateDestination)
+	router.POST("/images/:id", api.UploadImage)
+	router.PUT("", api.UpdateDestination) //edit destination
+	router.PUT("/images/:id", api.UploadImage)
+	router.DELETE("/:id", api.DeleteDestination)
+
+	// destinationRouterWithAuth := router.Group("/api/destination", AdminMiddleware())
+	// {
+	// 	destinationRouterWithAuth.POST("", api.CreateDestination)
+	// 	destinationRouterWithAuth.POST("/images/:id", api.UploadImage)
+	// 	destinationRouterWithAuth.PUT("", api.UpdateDestination)
+	// 	destinationRouterWithAuth.PUT("/images/:id", api.UploadImage)
+	// 	destinationRouterWithAuth.DELETE("/:id", api.DeleteDestination)
+	// }
 	
 	return api
 }
