@@ -20,12 +20,12 @@ func NewUserModels(db *sql.DB) *UserModels {
 	}
 }
 
-func (u *UserModels) GetUserRole(id int) (*string, error) {
-	statement := "SELECT role FROM user WHERE user_id = ?"
-	var role string
+func (u *UserModels) GetUserRole(id int) (*string, *string, *string, error) {
+	statement := "SELECT firstname, lastname, role FROM user WHERE user_id = ?"
+	var firstname, lastname, role string
 	res := u.db.QueryRow(statement, id)
-	err := res.Scan(&role)
-	return &role, err
+	err := res.Scan(&firstname, &lastname, &role)
+	return &firstname, &lastname, &role, err
 }
 
 func (u *UserModels) GetUserData(id int) (*User, error) {

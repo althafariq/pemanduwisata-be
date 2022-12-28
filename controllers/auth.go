@@ -37,12 +37,8 @@ type ProfilePicReqBody struct {
 
 type LoginSuccessResponse struct {
 	Token string `json:"token"`
+	Fullname string `json:"fullname"`
 	Message string `json:"message"`
-}
-
-type RegisterSuccessResponse struct {
-	Message string `json:"message"`
-	Token   string `json:"token"`
 }
 
 var jwtKey = []byte("key")
@@ -84,7 +80,10 @@ func (api *API) register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, RegisterSuccessResponse{Message: "register success", Token: tokenString})
+	c.JSON(http.StatusOK, LoginSuccessResponse{Token: tokenString,
+		Fullname: fmt.Sprintf("%s %s", input.Firstname, input.Lastname),
+		Message: fmt.Sprintf("You're now login as %s", input.Role),
+	})
 }
 
 func (api *API) login(c *gin.Context) {
@@ -111,7 +110,7 @@ func (api *API) login(c *gin.Context) {
 		return
 	}
 
-	role, err := api.userModels.GetUserRole(*userId)
+	firstname, lastname, role, err := api.userModels.GetUserRole(*userId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -125,7 +124,7 @@ func (api *API) login(c *gin.Context) {
 
 	c.JSON(http.StatusOK, LoginSuccessResponse{
 		Token: tokenString,
-		//show message with the role
+		Fullname: fmt.Sprintf("%s %s", *firstname, *lastname),
 		Message: fmt.Sprintf("You're now login as %s", *role),
 	})
 }
