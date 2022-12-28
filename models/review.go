@@ -70,7 +70,7 @@ func (r *ReviewModels) GetReviewbyUserID(reviewID int) (int, error) {
 
 
 func (r *ReviewModels) CreateReview(review Review) (int, error) {
-	statement := `INSERT INTO reviews (user_id, destination_id, rating, review, created_at) VALUES (?, ?, ?, ?, ?)`
+	statement := `INSERT INTO reviews (user_id, destination_id, rating, review, created_at) VALUES (?, ?, ?, ?, DATETIME('now'))`
 	result, err := r.db.Exec(statement, review.UserID, review.DestinationID, review.Rating, review.Review, review.CreatedAt)
 	if err != nil {
 		return -1, err

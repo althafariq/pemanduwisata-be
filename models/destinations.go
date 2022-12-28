@@ -73,13 +73,14 @@ func (d *DestinationModels) GetDestinationbyID(id int) ([]Destination, error) {
 }
 
 func (d *DestinationModels) CreateDestination(destination Destination) (int, error) {
-	statement := `INSERT INTO destinations (name, location, description, budaya_name, budaya_description) VALUES (?, ?, ?, ?, ?)`
+	statement := `INSERT INTO destinations (name, location, description, budaya_name, budaya_description, photo_path) VALUES (?, ?, ?, ?, ?, "media/destination/default.jpg")`
 	result, err := d.db.Exec(statement, 
 		destination.Name, 
 		destination.Location, 
 		destination.Description,
 		destination.BudayaName,
 		destination.BudayaDescription,
+		destination.PhotoPath,
 	)
 	if err != nil {
 		return 0, err
