@@ -94,10 +94,23 @@ func (d *DestinationModels) CreateDestination(destination Destination) (int, err
 //function to upload image to destinations table
 func (d *DestinationModels) InsertDestinationImage(ID int, PhotoPath string) error {
 	statement := `UPDATE destinations SET photo_path = ? WHERE id = ?`
-	_, err := d.db.Exec(statement, PhotoPath, ID)
+
+	tx, err := d.db.Begin()
 	if err != nil {
 		return err
 	}
+
+	defer tx.Rollback()
+
+	_, error := tx.Exec(statement, PhotoPath, ID)
+	if error != nil {
+		return err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
